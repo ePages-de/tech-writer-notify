@@ -1,0 +1,4 @@
+name: 'Tech Writer Notify'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
