@@ -19,18 +19,21 @@ OPTIONS:
     -s   Sender email address
     -r   Recepient email address
     -g   Path to the Git repository to be evaluated.
+    -p   Project org/name
     -h   Show this message.
     -?   Show this message.
 EOF
 }
 
-while getopts "s: r: g: h ?" option ; do
+while getopts "s: r: g: p: h ?" option ; do
      case $option in
           s)   SENDER_EMAIL="${OPTARG}"
                ;;
           r)   RECIPIENT_EMAIL="${OPTARG}"
                ;;
           g)   GIT_REPOSITORY="${OPTARG}"
+               ;;
+          p)   PROJECT="${OPTARG}"
                ;;
           h )  usage
                exit 0;;
@@ -51,6 +54,11 @@ fi
 
 if [[ -z "$GIT_REPOSITORY" ]]; then
   echo "Missing mandatory parameter '-g'."
+  exit 1
+fi
+
+if [[ -z "$PROJECT" ]]; then
+  echo "Missing mandatory parameter '-p'."
   exit 1
 fi
 
@@ -83,37 +91,20 @@ if [[ ${TOTAL_NUMBER_OF_COMMITS} -le 1 ]]; then
   exit 0
 fi
 
-REPO_NAME=${PWD##*/}
+REPO_NAME=${PROJECT##*/}
 RELEVANT_PATHS=$(cat .tech-writer-notify)
-
-echo "REPO_NAME: $REPO_NAME"
 
 COMMIT_LAST_NOTIFIED=$(find_last_notified_commit)
 COMMIT_IDS=$(git log ${COMMIT_LAST_NOTIFIED}..HEAD --pretty=format:"%h" -- ${RELEVANT_PATHS})
-
-echo "RELEVANT_PATHS: ${RELEVANT_PATHS}"
-echo "COMMIT_LAST_NOTIFIED: $COMMIT_LAST_NOTIFIED"
-echo "HEAD:"
-git show HEAD
-
-echo "hash for tech-writer-notified tag:"
-git rev-list -n 1 tech-writer-notified
-
-echo "git log [start]"
-git log
-echo "git log [end]"
-echo "git log [start]"
-git log ${COMMIT_LAST_NOTIFIED}..HEAD --oneline
-echo "git log [end]"
 
 if [[ -z "$COMMIT_IDS" ]]; then
   echo "There are no new changes which the Tech Writers need to be informed about."
   exit 0
 fi
 
-COMMIT_LINKS=$(list_with_commit_links ${REPO_NAME} "${COMMIT_IDS}")
+COMMIT_LINKS=$(list_with_commit_links ${PROJECT} "${COMMIT_IDS}")
 CHANGED_FILES=$(git diff ${COMMIT_LAST_NOTIFIED}..HEAD --name-only -- ${RELEVANT_PATHS})
-EMAIL_BODY=$(render_email_body ${REPO_NAME} "${COMMIT_LINKS}" "${CHANGED_FILES}" )
+EMAIL_BODY=$(render_email_body ${PROJECT} ${REPO_NAME} "${COMMIT_LINKS}" "${CHANGED_FILES}" )
 
 curl --fail --user "api:${MAILGUN_API_TOKEN}" \
   https://api.eu.mailgun.net/v3/${MAILGUN_MAILBOX}/messages \
