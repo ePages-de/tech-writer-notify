@@ -14,7 +14,8 @@ docker build -t tech-writer-notify .
 cd $YOUR_REPO_HERE
 
 docker run -ti --rm \
-  -v $(pwd):/src \
+  -v $(pwd):/github/workspace \
+  --workdir="/github/workspace" \
   --env SENDER_EMAIL=john@example.com \
   --env RECIPIENT_EMAIL=jane@example.com \
   --env MAILGUN_API_TOKEN=xxxx \
