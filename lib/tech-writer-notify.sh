@@ -67,8 +67,6 @@ fi
 
 cd ${GIT_REPOSITORY}
 
-pwd
-
 if [[ ! -d ".git" ]]; then
   echo "'${GIT_REPOSITORY}' is not a git repository."
   exit 1
