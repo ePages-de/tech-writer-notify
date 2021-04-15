@@ -95,7 +95,16 @@ echo "RELEVANT_PATHS: ${RELEVANT_PATHS}"
 echo "COMMIT_LAST_NOTIFIED: $COMMIT_LAST_NOTIFIED"
 echo "HEAD:"
 git show HEAD
+
+echo "hash for tech-writer-notified tag:"
+git rev-list -n 1 tech-writer-notified
+
+echo "git log [start]"
+git log
+echo "git log [end]"
+echo "git log [start]"
 git log ${COMMIT_LAST_NOTIFIED}..HEAD --oneline
+echo "git log [end]"
 
 if [[ -z "$COMMIT_IDS" ]]; then
   echo "There are no new changes which the Tech Writers need to be informed about."
