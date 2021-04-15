@@ -86,8 +86,16 @@ fi
 REPO_NAME=${PWD##*/}
 RELEVANT_PATHS=$(cat .tech-writer-notify)
 
+echo "REPO_NAME: $REPO_NAME"
+
 COMMIT_LAST_NOTIFIED=$(find_last_notified_commit)
 COMMIT_IDS=$(git log ${COMMIT_LAST_NOTIFIED}..HEAD --pretty=format:"%h" -- ${RELEVANT_PATHS})
+
+echo "RELEVANT_PATHS: ${RELEVANT_PATHS}"
+echo "COMMIT_LAST_NOTIFIED: $COMMIT_LAST_NOTIFIED"
+echo "HEAD:"
+git show HEAD
+git log ${COMMIT_LAST_NOTIFIED}..HEAD --oneline
 
 if [[ -z "$COMMIT_IDS" ]]; then
   echo "There are no new changes which the Tech Writers need to be informed about."
