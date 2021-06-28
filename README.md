@@ -2,6 +2,34 @@
 
 GitHub Action which sends notification emails for Tech Writers
 
+## Usage
+
+To use this action, create a YAML file in the directory `.github/workflows` with such like contents:
+
+```yaml
+name: Tech Writer Notify
+on:
+  push:
+    branches: [ master ]
+jobs:
+  tech_writer_notify:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT: ${{ github.repository }}
+      SENDER_EMAIL: noreply@example.com
+      RECIPIENT_EMAIL: recipient@example.com
+      MAILGUN_API_TOKEN: ${{ secrets.MAILGUN_API_TOKEN }}
+      MAILGUN_MAILBOX: ${{ secrets.MAILGUN_MAILBOX }}
+    if: github.repository == 'ePages-de/example'
+    steps:
+      - name: Checkout microservice
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Run Tech Writer notification
+        uses: ePages-de/tech-writer-notify@master
+```
+
 ## Build Docker Image
 
 ```
